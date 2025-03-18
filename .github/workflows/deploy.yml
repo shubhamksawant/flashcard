@@ -24,6 +24,7 @@ jobs:
           pip install -r requirements.txt
           pip install pytest requests
 
+          
       - name: Deploy to Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
