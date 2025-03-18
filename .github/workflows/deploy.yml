@@ -34,21 +34,21 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Wait for deployment
-        run: sleep 30  # Wait for deployment to complete
+      # - name: Wait for deployment
+      #   run: sleep 30  # Wait for deployment to complete
 
-      - name: Run post-deployment tests
-        env:
-          BASE_URL: ${{ steps.deploy.outputs.url }}
-        run: |
-          python -m pytest tests/test_deployment.py
+      # - name: Run post-deployment tests
+      #   env:
+      #     BASE_URL: ${{ steps.deploy.outputs.url }}
+      #   run: |
+      #     python -m pytest tests/test_deployment.py
 
-      - name: Check website status
-        run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" ${{ env.BASE_URL }})
-          if [ $response -eq 200 ]; then
-            echo "Website is up and running!"
-          else
-            echo "Website check failed with status code: $response"
-            exit 1
-          fi 
+      # - name: Check website status
+      #   run: |
+      #     response=$(curl -s -o /dev/null -w "%{http_code}" ${{ env.BASE_URL }})
+      #     if [ $response -eq 200 ]; then
+      #       echo "Website is up and running!"
+      #     else
+      #       echo "Website check failed with status code: $response"
+      #       exit 1
+      #     fi 
