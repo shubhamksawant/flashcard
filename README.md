@@ -1,6 +1,6 @@
 # DevOps Flashcards Application
 
-An interactive web-based flashcard application for studying DevOps-related topics. Built with Flask and modern web technologies.
+An interactive web-based flashcard application for studying DevOps-related topics.
 
 ## Features
 
@@ -16,8 +16,8 @@ An interactive web-based flashcard application for studying DevOps-related topic
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/devops-flashcards.git
-cd devops-flashcards
+git clone <your-repo-url>
+cd flashcard
 ```
 
 2. Create a virtual environment and activate it:

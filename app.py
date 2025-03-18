@@ -1,10 +1,10 @@
-from flask import Flask, render_template, jsonify, request, session
+from flask import Flask, render_template, jsonify, request, session, send_from_directory
 import json
 import os
 import random
 
-app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'  # Required for session
+app = Flask(__name__, static_folder='static', static_url_path='/static')
+app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here')
 
 class FlashcardManager:
     def __init__(self):
@@ -23,7 +23,7 @@ class FlashcardManager:
     
     def get_questions(self, topic):
         try:
-            with open(f"questions/{topic}/questions.json", "r") as f:
+            with open(os.path.join(self.questions_dir, topic, 'questions.json'), 'r') as f:
                 data = json.load(f)
                 # Add index to each question
                 for idx, question in enumerate(data["questions"]):
@@ -94,5 +94,11 @@ def flagged_cards(topic):
                          flagged_cards=flagged_cards,
                          flagged_mode=True)
 
+@app.route('/static/<path:path>')
+def serve_static(path):
+    return send_from_directory('static', path)
+
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run()
+
+app = app.wsgi_app 
