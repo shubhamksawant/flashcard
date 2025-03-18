@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ topic|upper }} Flashcards</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('home') }}" class="back-button">← Back to Topics</a>
+        <h1>{{ topic|upper }} Flashcards</h1>
+        
+        <div class="mode-selector">
+            <a href="{{ url_for('topic', topic=topic) }}" class="mode-button {% if not flagged_mode|default(false) %}active{% endif %}">All Cards</a>
+            <a href="{{ url_for('flagged_cards', topic=topic) }}" class="mode-button {% if flagged_mode|default(false) %}active{% endif %}">Flagged Cards</a>
+        </div>
+
+        <div class="card-navigation">
+            <div class="card-numbers">
+                {% for q in questions %}
+                <a href="{{ url_for('topic', topic=topic, card=q.id) }}" 
+                   class="card-number {% if loop.index0 == start_card %}active{% endif %} {% if q.id in flagged_cards %}flagged{% endif %}"
+                   data-card-index="{{ loop.index0 }}">
+                    {{ q.id }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="flashcard-container">
+            <div class="flashcard" id="flashcard">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">
+                        <p id="question"></p>
+                        <button class="flag-button" id="flagBtn">
+                            <i class="fas fa-flag"></i>
+                        </button>
+                    </div>
+                    <div class="flashcard-back">
+                        <p id="answer"></p>
+                        <button class="flag-button" id="flagBtnBack">
+                            <i class="fas fa-flag"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button id="prevBtn">Previous</button>
+                <button id="flipBtn">Flip Card</button>
+                <button id="nextBtn">Next</button>
+            </div>
+            
+            <div class="progress">
+                Question <span id="currentCard">1</span> of <span id="totalCards">{{ questions|length }}</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = {{ questions|tojson|safe }};
+        const topic = "{{ topic }}";
+        const flaggedCards = {{ flagged_cards|tojson|safe }};
+        let currentIndex = {{ start_card }};
+        let isFlipped = false;
+
+        const flashcard = document.getElementById('flashcard');
+        const questionEl = document.getElementById('question');
+        const answerEl = document.getElementById('answer');
+        const currentCardEl = document.getElementById('currentCard');
+        const flagBtn = document.getElementById('flagBtn');
+        const flagBtnBack = document.getElementById('flagBtnBack');
+        
+        function updateCard() {
+            const question = questions[currentIndex];
+            questionEl.textContent = question.question;
+            answerEl.textContent = question.answer;
+            currentCardEl.textContent = currentIndex + 1;
+            isFlipped = false;
+            flashcard.classList.remove('flipped');
+            
+            // Update flag button state
+            const isFlagged = flaggedCards.includes(question.id);
+            flagBtn.classList.toggle('active', isFlagged);
+            flagBtnBack.classList.toggle('active', isFlagged);
+            
+            // Update card number highlighting
+            document.querySelectorAll('.card-number').forEach(num => {
+                num.classList.remove('active');
+                if (parseInt(num.dataset.cardIndex) === currentIndex) {
+                    num.classList.add('active');
+                }
+            });
+        }
+
+        async function toggleFlag() {
+            const question = questions[currentIndex];
+            const response = await fetch('/api/flag-card', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    topic: topic,
+                    cardId: question.id
+                })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                const cardNumber = document.querySelector(`.card-number[data-card-index="${currentIndex}"]`);
+                cardNumber.classList.toggle('flagged', data.is_flagged);
+                flagBtn.classList.toggle('active', data.is_flagged);
+                flagBtnBack.classList.toggle('active', data.is_flagged);
+                
+                if (data.is_flagged) {
+                    flaggedCards.push(question.id);
+                } else {
+                    const index = flaggedCards.indexOf(question.id);
+                    if (index > -1) {
+                        flaggedCards.splice(index, 1);
+                    }
+                }
+            }
+        }
+
+        flagBtn.addEventListener('click', toggleFlag);
+        flagBtnBack.addEventListener('click', toggleFlag);
+
+        document.getElementById('flipBtn').addEventListener('click', () => {
+            isFlipped = !isFlipped;
+            flashcard.classList.toggle('flipped');
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                updateCard();
+            }
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCard();
+            }
+        });
+
+        // Initialize first card
+        updateCard();
+    </script>
+</body>
+</html> 

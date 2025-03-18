@@ -1,0 +1,24 @@
+{
+    "questions": [
+        {
+            "question": "What is Docker?",
+            "answer": "Docker is a platform for developing, shipping, and running applications in containers. It enables you to separate your applications from your infrastructure for fast delivery and consistent deployment."
+        },
+        {
+            "question": "What is the difference between a Docker Image and a Container?",
+            "answer": "A Docker Image is a read-only template containing instructions for creating a Docker container. It's like a snapshot. A Container is a runnable instance of an image - what the image becomes in memory when executed."
+        },
+        {
+            "question": "Explain Docker architecture",
+            "answer": "Docker uses a client-server architecture. The Docker client talks to the Docker daemon (server), which handles building, running, and distributing Docker containers. The daemon and client can run on the same system or connect remotely."
+        },
+        {
+            "question": "What is a Dockerfile?",
+            "answer": "A Dockerfile is a text document containing all the commands a user could call on the command line to assemble an image. Docker can automatically build images by reading the instructions from a Dockerfile."
+        },
+        {
+            "question": "What is Docker Compose?",
+            "answer": "Docker Compose is a tool for defining and running multi-container Docker applications. It uses a YAML file to configure application services, and with a single command, you can create and start all services from your configuration."
+        }
+    ]
+} 
