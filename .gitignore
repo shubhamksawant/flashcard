@@ -5,8 +5,29 @@ __pycache__/
 *.so
 .Python
 env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Flask
+instance/
+.webassets-cache
+*.db
+
+# Virtual Environment
 venv/
-.env
+ENV/
 
 # IDE
 .idea/
@@ -14,12 +35,12 @@ venv/
 *.swp
 *.swo
 
-# Flask
-instance/
-.webassets-cache
-flask_session/
-
 # OS
 .DS_Store
 Thumbs.db
 .vercel
+
+# Application specific
+upload/
+uploads/
+*.log

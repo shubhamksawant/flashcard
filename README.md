@@ -1,32 +1,27 @@
-# DevOps Flashcards Application
+# DevOps Flashcard Application
 
-An interactive web-based flashcard application for studying DevOps-related topics.
+A Flask-based flashcard application designed to help users learn DevOps concepts through spaced repetition.
 
 ## Features
 
 - Multiple DevOps topics (AWS, Docker, Kubernetes, etc.)
-- Interactive flashcards with flip animation
-- Card flagging system for difficult questions
+- Spaced repetition learning
+- Admin interface for managing questions
+- Topic-based organization
 - Progress tracking
-- Topic-wise organization
-- Numbered navigation
-- Flagged cards review mode
 
 ## Installation
 
 1. Clone the repository:
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/yourusername/flashcard.git
 cd flashcard
 ```
 
-2. Create a virtual environment and activate it:
+2. Create and activate a virtual environment:
 ```bash
 python -m venv venv
-# On Windows:
-venv\Scripts\activate
-# On Unix or MacOS:
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 3. Install dependencies:
@@ -34,46 +29,34 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Run the application:
+4. Initialize the database:
+```bash
+python
+>>> from app import app, db
+>>> with app.app_context():
+...     db.create_all()
+```
+
+5. Load questions:
+```bash
+python questions/load_questions.py
+```
+
+## Usage
+
+1. Start the application:
 ```bash
 python app.py
 ```
 
-5. Open your browser and navigate to:
-```
-http://localhost:5000
-```
+2. Access the application at `http://localhost:5000`
 
-## Adding New Topics
-
-1. Create a new directory in the `questions` folder:
-```bash
-mkdir questions/your_topic_name
-```
-
-2. Create a `questions.json` file in the new directory with the following format:
-```json
-{
-    "questions": [
-        {
-            "question": "Your question here?",
-            "answer": "Your detailed answer here."
-        }
-    ]
-}
-```
-
-## Project Structure
+## Directory Structure
 
 ```
 flashcard/
-├── app.py              # Main Flask application
-├── requirements.txt    # Python dependencies
-├── static/
-│   └── style.css      # Application styles
-├── templates/
-│   ├── index.html     # Home page template
-│   └── flashcards.html # Flashcard view template
+├── app.py                 # Main application file
+├── models.py             
 └── questions/
     ├── aws/
     ├── docker/
