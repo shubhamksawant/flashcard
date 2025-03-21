@@ -51,17 +51,18 @@ http://localhost:5000
 mkdir questions/your_topic_name
 ```
 
-2. Create a `questions.json` file in the new directory with the following format:
-```json
-{
-    "questions": [
-        {
-            "question": "Your question here?",
-            "answer": "Your detailed answer here."
-        }
-    ]
-}
+2. Create a `questions.py` file in the new directory with the following format:
+```python
+questions = [
+    {
+        "question": """Your question here?""",
+        "answer": """Your detailed answer here.""",
+        "topic": "your_topic_name"
+    }
+]
 ```
+
+The application supports both Python (.py) and JSON (.json) formats for questions. The Python format is preferred as it provides better readability with triple quotes and native Python syntax.
 
 ## Project Structure
 
@@ -85,7 +86,7 @@ flashcard/
 
 - Backend: Python, Flask
 - Frontend: HTML, CSS, JavaScript
-- Storage: JSON files, Flask sessions
+- Storage: Python modules, JSON files, Flask sessions
 
 ## Contributing
 
@@ -98,8 +99,8 @@ flashcard/
 
 To contribute new questions:
 1. Choose the appropriate topic directory
-2. Edit the questions.json file
-3. Ensure proper JSON formatting
+2. Create or edit the questions.py file
+3. Follow the Python questions format
 4. Submit a pull request
 
 ## License

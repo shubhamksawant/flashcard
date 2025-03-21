@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify, request, session, send_from_d
 import json
 import os
 import random
+import importlib.util
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here')
@@ -9,27 +10,62 @@ app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here')
 class FlashcardManager:
     def __init__(self):
         self.questions_dir = "questions"
+        print(f"Questions directory: {os.path.abspath(self.questions_dir)}")  # Debug log
     
     def get_topics(self):
         """Get all available topics by scanning the questions directory"""
         try:
+            print(f"Scanning directory: {os.path.abspath(self.questions_dir)}")  # Debug log
             # Get all directories in the questions folder
-            topics = [d for d in os.listdir(self.questions_dir) 
-                     if os.path.isdir(os.path.join(self.questions_dir, d))
-                     and os.path.exists(os.path.join(self.questions_dir, d, 'questions.json'))]
+            all_items = os.listdir(self.questions_dir)
+            print(f"All items in directory: {all_items}")  # Debug log
+            
+            topics = []
+            for d in all_items:
+                full_path = os.path.join(self.questions_dir, d)
+                if os.path.isdir(full_path):
+                    py_path = os.path.join(full_path, 'questions.py')
+                    json_path = os.path.join(full_path, 'questions.json')
+                    print(f"Checking directory {d}:")  # Debug log
+                    print(f"  Python file exists: {os.path.exists(py_path)}")  # Debug log
+                    print(f"  JSON file exists: {os.path.exists(json_path)}")  # Debug log
+                    if os.path.exists(py_path) or os.path.exists(json_path):
+                        topics.append(d)
+            
+            print(f"Found topics: {topics}")  # Debug log
             return sorted(topics)  # Sort alphabetically
-        except FileNotFoundError:
+        except FileNotFoundError as e:
+            print(f"FileNotFoundError: {e}")  # Debug log
+            return []
+        except Exception as e:
+            print(f"Unexpected error in get_topics: {e}")  # Debug log
             return []
     
     def get_questions(self, topic):
         try:
-            with open(os.path.join(self.questions_dir, topic, 'questions.json'), 'r') as f:
-                data = json.load(f)
-                # Add index to each question
-                for idx, question in enumerate(data["questions"]):
-                    question["id"] = idx + 1
-                return data["questions"]
-        except FileNotFoundError:
+            # First try to load from .py file
+            py_path = os.path.join(self.questions_dir, topic, 'questions.py')
+            if os.path.exists(py_path):
+                # Load the Python module dynamically
+                spec = importlib.util.spec_from_file_location("questions", py_path)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                questions = module.questions
+            else:
+                # Fall back to JSON if .py doesn't exist
+                json_path = os.path.join(self.questions_dir, topic, 'questions.json')
+                with open(json_path, 'r') as f:
+                    data = json.load(f)
+                    questions = data["questions"]
+            
+            # Add index and topic to each question if not present
+            for idx, question in enumerate(questions):
+                question["id"] = idx + 1
+                if "topic" not in question:
+                    question["topic"] = topic
+            return questions
+        except (FileNotFoundError, ImportError, AttributeError) as e:
+            print(f"Error loading questions for topic {topic}: {e}")
             return []
     
     def get_flagged_cards(self, topic):
